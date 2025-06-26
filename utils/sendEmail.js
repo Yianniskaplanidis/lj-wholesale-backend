@@ -56,12 +56,7 @@ const sendAdminEmail = async ({
         <tr><td><strong>Terms Accepted:</strong></td><td>${terms_accepted ? '✅ Yes' : '❌ No'}</td></tr>
       </table>
 
-      <div style="margin: 30px 0; text-align: center;">
-        <a href="${approveLink}" style="display: inline-block; background-color: #618C02; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
-          ✔ Approve
-        </a>
-      </div>
-
+      
       <div style="margin-top: 40px; font-size: 12px; color: #999; text-align: center;">
         <p>Submitted: ${now}</p>
         <p>From website: <a href="https://www.littlejoy.com.au" style="color: #618C02;">littlejoy.com.au</a></p>
