@@ -113,20 +113,68 @@ const sendCustomerEmail = async ({ contact_email, contact_name }) => {
   await transporter.sendMail(mailOptions);
 };
 
-const sendApprovalEmail = async ({ email }) => {
+const sendApprovalEmail = async ({
+  business_name,
+  contact_name,
+  contact_number,
+  abn,
+  contact_email,
+  address,
+  message,
+  accepts_marketing,
+  terms_accepted,
+  token
+}) => {
+  const now = new Date().toLocaleString('en-AU', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Australia/Sydney',
+  });
+
+  const approveLink = `https://lj-wholesale-backend.onrender.com/wholesale/approve?token=${token}`;
+  const declineLink = `https://lj-wholesale-backend.onrender.com/wholesale/decline?token=${token}`;
+
   const html = `
-    <div style="font-family: Poppins, sans-serif; color: #333; padding: 30px; background: #fff; border-radius: 10px;">
-      <p>Hello Graphics Team,</p>
-      <p>A new wholesale registration has been approved.</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p>Please create the customer in Shopify and send them the link to set up their password.</p>
+    <div style="font-family: Poppins, sans-serif; background: #ffffff; border: 1px solid #eee; border-radius: 16px; padding: 30px; max-width: 640px; margin: 30px auto; color: #000;">
+      <div style="text-align: center; margin-bottom: 25px;">
+        <img src="https://cdn.shopify.com/s/files/1/0935/0912/4390/files/Little_joy_Logo_Leaf-11.png?v=1741143803" alt="Little Joy Logo" style="height: 45px;">
+      </div>
+
+      <h2 style="text-align: center; color: #618C02; margin-bottom: 30px;">📥 New Wholesale Signup Received</h2>
+
+      <table style="width: 100%; font-size: 15px; line-height: 1.8;">
+        <tr><td><strong>Business Name:</strong></td><td>${business_name}</td></tr>
+        <tr><td><strong>Contact Name:</strong></td><td>${contact_name}</td></tr>
+        <tr><td><strong>Phone:</strong></td><td>${contact_number}</td></tr>
+        <tr><td><strong>ABN:</strong></td><td>${abn}</td></tr>
+        <tr><td><strong>Email:</strong></td><td>${contact_email}</td></tr>
+        <tr><td><strong>Address:</strong></td><td>${address}</td></tr>
+        <tr><td><strong>Message:</strong></td><td>${message || '(none)'}</td></tr>
+        <tr><td><strong>Marketing Consent:</strong></td><td>${accepts_marketing ? '✅ Yes' : '❌ No'}</td></tr>
+        <tr><td><strong>Terms Accepted:</strong></td><td>${terms_accepted ? '✅ Yes' : '❌ No'}</td></tr>
+      </table>
+
+      <div style="margin: 30px 0; text-align: center;">
+        <a href="${approveLink}" style="background-color: #618C02; color: white; padding: 10px 24px; text-decoration: none; font-weight: 600; border-radius: 6px; margin-right: 10px;">✔️ Approve</a>
+        <a href="${declineLink}" style="background-color: #D32F2F; color: white; padding: 10px 24px; text-decoration: none; font-weight: 600; border-radius: 6px;">❌ Decline</a>
+      </div>
+
+      <div style="margin-top: 30px; font-size: 12px; color: #888; text-align: center;">
+        <p>Submitted: ${now}</p>
+        <p>From website: <a href="https://www.littlejoy.com.au" style="color: #618C02;">littlejoy.com.au</a></p>
+        <p>Contact: <a href="mailto:info@sugarlean.com.au" style="color: #618C02;">info@sugarlean.com.au</a></p>
+      </div>
     </div>
   `;
 
   await transporter.sendMail({
     from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
     to: 'graphics@sugarlessco.com',
-    subject: '✅ Wholesale Signup Approved',
+    subject: '✅ Wholesale Signup Approved – Full Details',
     html,
   });
 };
