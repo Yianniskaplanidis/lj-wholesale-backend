@@ -60,11 +60,11 @@ const sendAdminEmail = async ({
       </table>
 
       <div style="margin: 30px 0; text-align: center;">
-         <a href="${approveLink}" style="display: inline-block; background-color: #618C02; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; margin-right: 12px;">
-          ✔ Approve
+        <a href="${approveLink}" style="display: inline-block; background-color: #618C02; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; margin-right: 12px;">
+          <span style="color: #fff; font-size: 16px; vertical-align: middle;">✔</span> Approve
         </a>
         <a href="${declineLink}" style="display: inline-block; background-color: #D32F2F; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
-          ✖ Decline
+          <span style="color: #fff; font-size: 16px; vertical-align: middle;">✖</span> Decline
         </a>
       </div>
 
