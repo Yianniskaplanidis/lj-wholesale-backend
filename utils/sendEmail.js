@@ -36,8 +36,8 @@ const sendAdminEmail = async ({
     timeZone: 'Australia/Sydney',
   });
 
-  const approveLink = `https://your-backend-domain.com/wholesale/approve?token=${token}`;
-  const declineLink = `https://your-backend-domain.com/wholesale/decline?token=${token}`;
+  const approveLink = `https://lj-wholesale-backend.onrender.com/wholesale/approve?token=${token}`;
+const declineLink = `https://lj-wholesale-backend.onrender.com/wholesale/decline?token=${token}`;
 
   const html = `
     <div style="font-family: Poppins, sans-serif; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; max-width: 600px; margin: 30px auto; color: #333;">
