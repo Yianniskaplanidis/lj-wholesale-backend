@@ -26,6 +26,7 @@ const sendAdminEmail = async ({
   terms_accepted,
   token
 }) => {
+  const approveLink = `https://www.littlejoy.com.au/admin/approve?token=${token}`;
   const now = new Date().toLocaleString('en-AU', {
     day: '2-digit',
     month: 'short',
@@ -56,7 +57,12 @@ const sendAdminEmail = async ({
         <tr><td><strong>Terms Accepted:</strong></td><td>${terms_accepted ? '✅ Yes' : '❌ No'}</td></tr>
       </table>
 
-      
+      <div style="margin: 30px 0; text-align: center;">
+        <a href="${approveLink}" style="display: inline-block; background-color: #618C02; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
+          ✔ Approve
+        </a>
+      </div>
+
       <div style="margin-top: 40px; font-size: 12px; color: #999; text-align: center;">
         <p>Submitted: ${now}</p>
         <p>From website: <a href="https://www.littlejoy.com.au" style="color: #618C02;">littlejoy.com.au</a></p>
@@ -69,7 +75,7 @@ const sendAdminEmail = async ({
     from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
     to: 'info@sugarlean.com.au',
     replyTo: 'info@sugarlean.com.au',
-    subject: '📩 New Wholesale Application',
+    subject: '📩 New Wholesale Application — Please Add Our New Customer',
     html,
   });
 };
@@ -87,10 +93,10 @@ const sendCustomerEmail = async ({ contact_email, contact_name }) => {
         If you have any questions, feel free to contact us anytime.
       </p>
       <a href="https://www.littlejoy.com.au" style="display: inline-block; margin-top: 30px; padding: 12px 24px; background-color: #618C02; color: white; border-radius: 6px; text-decoration: none; font-weight: 600;">Visit Our Store</a>
-      <p style="margin-top: 40px; font-size: 12px; color: #999;">© 2025 Little Joy Confectionery. All rights reserved.<br>
-<p style="margin-top: 40px; font-size: 12px; color: #999;">
-  Contact us at <a href="mailto:info@sugarlean.com.au" style="color: #999;">info@sugarlean.com.au</a> if you have any further questions.
-</p>
+      <p style="margin-top: 40px; font-size: 12px; color: #999;">© 2025 Little Joy Confectionery. All rights reserved.</p>
+      <p style="margin-top: 40px; font-size: 12px; color: #999;">
+        Contact us at <a href="mailto:info@sugarlean.com.au" style="color: #999;">info@sugarlean.com.au</a> if you have any further questions.
+      </p>
     </div>
   `;
 
@@ -102,7 +108,6 @@ const sendCustomerEmail = async ({ contact_email, contact_name }) => {
     html,
   });
 };
-
 
 module.exports = {
   sendAdminEmail,
