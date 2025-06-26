@@ -93,7 +93,9 @@ const sendCustomerEmail = async ({ contact_email, contact_name }) => {
       </p>
       <a href="https://www.littlejoy.com.au" style="display: inline-block; margin-top: 30px; padding: 12px 24px; background-color: #618C02; color: white; border-radius: 6px; text-decoration: none; font-weight: 600;">Visit Our Store</a>
       <p style="margin-top: 40px; font-size: 12px; color: #999;">© 2025 Little Joy Confectionery. All rights reserved.<br>
-      Contact us at <a href="mailto:info@sugarlean.com.au" style="color: #999;">info@sugarlean.com.au</a></p>
+<p style="margin-top: 40px; font-size: 12px; color: #999;">
+  Contact us at <a href="mailto:info@sugarlean.com.au" style="color: #999;">info@sugarlean.com.au</a> if you have any further questions.
+</p>
     </div>
   `;
 
