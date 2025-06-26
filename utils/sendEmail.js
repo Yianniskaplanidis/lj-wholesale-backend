@@ -119,7 +119,6 @@ const sendApprovalEmail = async ({
   message,
   accepts_marketing,
   terms_accepted,
-  token
 }) => {
   const now = new Date().toLocaleString('en-AU', {
     day: '2-digit',
@@ -137,7 +136,7 @@ const sendApprovalEmail = async ({
         <img src="https://cdn.shopify.com/s/files/1/0935/0912/4390/files/Little_joy_Logo_Leaf-11.png?v=1741143803" alt="Little Joy Logo" style="height: 45px;">
       </div>
 
-      <h2 style="text-align: center; color: #618C02; margin-bottom: 30px;">📥 New Wholesale Signup Received</h2>
+      <h2 style="text-align: center; color: #618C02; margin-bottom: 30px;">🟢 New Wholesale Customer Approved</h2>
 
       <table style="width: 100%; font-size: 15px; line-height: 1.8;">
         <tr><td><strong>Business Name:</strong></td><td>${business_name}</td></tr>
@@ -152,7 +151,7 @@ const sendApprovalEmail = async ({
       </table>
 
       <div style="margin-top: 30px; font-size: 12px; color: #888; text-align: center;">
-        <p>Submitted: ${now}</p>
+        <p>Approved: ${now}</p>
         <p>From website: <a href="https://www.littlejoy.com.au" style="color: #618C02;">littlejoy.com.au</a></p>
         <p>Contact: <a href="mailto:info@sugarlean.com.au" style="color: #618C02;">info@sugarlean.com.au</a></p>
       </div>
@@ -161,11 +160,13 @@ const sendApprovalEmail = async ({
 
   await transporter.sendMail({
     from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
-    to: 'graphics@sugarlessco.com',
-    subject: '✅ Wholesale Signup Approved – Full Details',
+    to: 'graphics@sugarlessco.com', // ✅ Forward to graphics team only
+    replyTo: 'info@sugarlean.com.au',
+    subject: '✅ Please add our new wholesale customer',
     html,
   });
 };
+
 
 module.exports = {
   sendAdminEmail,
