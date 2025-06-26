@@ -1,8 +1,44 @@
+// routes/wholesale.js
 const express = require('express');
 const router = express.Router();
-const { sendAdminEmail, sendCustomerEmail } = require('../utils/sendEmail');
+const {
+  sendAdminEmail,
+  sendCustomerEmail,
+  sendApprovalEmail,
+  sendDeclineEmail
+} = require('../utils/sendEmail');
 
-// ✅ POST /wholesale/signup — new wholesale registration
+const crypto = require('crypto');
+
+// Shared secret key for signing (keep safe)
+const SECRET_KEY = process.env.ACTION_SECRET || 'replace_this_secret';
+
+// 🔒 Create signed token
+function createSignedToken(email) {
+  const timestamp = Date.now();
+  const data = `${email}:${timestamp}`;
+  const hash = crypto.createHmac('sha256', SECRET_KEY).update(data).digest('hex');
+  return `${email}:${timestamp}:${hash}`;
+}
+
+// 🔒 Verify signed token
+function verifyToken(token) {
+  if (!token) return null;
+  const parts = token.split(':');
+  if (parts.length !== 3) return null;
+  const [email, timestamp, hash] = parts;
+
+  const expected = crypto.createHmac('sha256', SECRET_KEY)
+    .update(`${email}:${timestamp}`)
+    .digest('hex');
+
+  // Check hash and 10 min expiration
+  const now = Date.now();
+  const isValid = expected === hash && now - parseInt(timestamp) < 10 * 60 * 1000;
+  return isValid ? email : null;
+}
+
+// ✅ POST /wholesale/signup
 router.post('/signup', async (req, res) => {
   const {
     business_name,
@@ -16,7 +52,6 @@ router.post('/signup', async (req, res) => {
     terms_accepted
   } = req.body;
 
-  // ✅ Validate required fields and terms checkbox
   if (
     !business_name ||
     !contact_name ||
@@ -30,7 +65,8 @@ router.post('/signup', async (req, res) => {
   }
 
   try {
-    // ✅ Send styled email to Little Joy team
+    const token = createSignedToken(contact_email);
+
     await sendAdminEmail({
       business_name,
       contact_name,
@@ -40,16 +76,46 @@ router.post('/signup', async (req, res) => {
       address,
       message,
       accepts_marketing,
-      terms_accepted
+      terms_accepted,
+      token // ✅ Include token in admin email for action buttons
     });
 
-    // ✅ Send confirmation to the applicant
     await sendCustomerEmail({ contact_email, contact_name });
 
-    res.status(200).json({ success: true, message: 'Signup successful.' });
+    res.status(200).json({ success: true });
   } catch (err) {
     console.error('❌ Email error:', err);
     res.status(500).json({ error: 'Email failed to send.' });
+  }
+});
+
+// ✅ GET /wholesale/approve?token=...
+router.get('/approve', async (req, res) => {
+  const { token } = req.query;
+  const email = verifyToken(token);
+  if (!email) return res.status(403).send('Invalid or expired token.');
+
+  try {
+    await sendApprovalEmail({ email });
+    res.send('✅ Approval email sent to graphics team.');
+  } catch (err) {
+    console.error('Approval Email Error:', err);
+    res.status(500).send('Failed to send approval email.');
+  }
+});
+
+// ✅ GET /wholesale/decline?token=...
+router.get('/decline', async (req, res) => {
+  const { token } = req.query;
+  const email = verifyToken(token);
+  if (!email) return res.status(403).send('Invalid or expired token.');
+
+  try {
+    await sendDeclineEmail({ email });
+    res.send('❌ Decline email sent to applicant.');
+  } catch (err) {
+    console.error('Decline Email Error:', err);
+    res.status(500).send('Failed to send decline email.');
   }
 });
 

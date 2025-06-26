@@ -24,6 +24,7 @@ const sendAdminEmail = async ({
   message,
   accepts_marketing,
   terms_accepted,
+  token
 }) => {
   const now = new Date().toLocaleString('en-AU', {
     day: '2-digit',
@@ -34,6 +35,9 @@ const sendAdminEmail = async ({
     hour12: true,
     timeZone: 'Australia/Sydney',
   });
+
+  const approveLink = `https://your-backend-domain.com/wholesale/approve?token=${token}`;
+  const declineLink = `https://your-backend-domain.com/wholesale/decline?token=${token}`;
 
   const html = `
     <div style="font-family: Poppins, sans-serif; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; max-width: 600px; margin: 30px auto; color: #333;">
@@ -55,6 +59,11 @@ const sendAdminEmail = async ({
         <tr><td><strong>Terms Accepted:</strong></td><td>${terms_accepted ? '✅ Yes' : '❌ No'}</td></tr>
       </table>
 
+      <div style="margin: 30px 0; text-align: center;">
+        <a href="${approveLink}" style="background-color: #618C02; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 6px; margin-right: 10px;">✅ Approve</a>
+        <a href="${declineLink}" style="background-color: #D32F2F; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 6px;">❌ Decline</a>
+      </div>
+
       <div style="margin-top: 40px; font-size: 12px; color: #999; text-align: center;">
         <p>Submitted: ${now}</p>
         <p>From website: <a href="https://www.littlejoy.com.au" style="color: #618C02;">littlejoy.com.au</a></p>
@@ -72,7 +81,6 @@ const sendAdminEmail = async ({
   });
 };
 
-// ✅ Customer Confirmation Email
 const sendCustomerEmail = async ({ contact_email, contact_name }) => {
   const html = `
     <div style="font-family: Poppins, sans-serif; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; max-width: 600px; margin: 30px auto; text-align: center; color: #000;">
@@ -101,8 +109,49 @@ const sendCustomerEmail = async ({ contact_email, contact_name }) => {
   await transporter.sendMail(mailOptions);
 };
 
-// ✅ Export
+const sendApprovalEmail = async ({ email }) => {
+  const html = `
+    <div style="font-family: Poppins, sans-serif; color: #333; padding: 30px; background: #fff; border-radius: 10px;">
+      <p>Hello Graphics Team,</p>
+      <p>A new wholesale registration has been approved.</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p>Please create the customer in Shopify and send them the link to set up their password.</p>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
+    to: 'graphics@sugarlessco.com',
+    subject: '✅ Wholesale Signup Approved',
+    html,
+  });
+};
+
+const sendDeclineEmail = async ({ email }) => {
+  const html = `
+    <div style="font-family: Poppins, sans-serif; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; max-width: 600px; margin: 30px auto; color: #000; text-align: center;">
+      <img src="https://cdn.shopify.com/s/files/1/0935/0912/4390/files/Little_joy_Logo_Leaf-11.png?v=1741143803" style="height: 50px; margin-bottom: 20px;">
+      <h2 style="color: #618C02;">Wholesale Application Update</h2>
+      <p style="font-size: 15px; line-height: 1.6;">
+        Thank you for applying for a wholesale account with Little Joy Confectionery.<br><br>
+        After reviewing your application, we’re unable to proceed at this time.<br><br>
+        If you believe this may be a mistake or have questions, please feel free to contact us at <a href="mailto:info@sugarlean.com.au">info@sugarlean.com.au</a>.
+      </p>
+      <p style="margin-top: 30px;">Warm regards,<br><strong>The Little Joy Team</strong></p>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: 'Little Joy Wholesale Application – Update',
+    html,
+  });
+};
+
 module.exports = {
   sendAdminEmail,
   sendCustomerEmail,
+  sendApprovalEmail,
+  sendDeclineEmail,
 };
