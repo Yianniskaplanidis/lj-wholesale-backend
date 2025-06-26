@@ -37,7 +37,6 @@ const sendAdminEmail = async ({
   });
 
   const approveLink = `https://lj-wholesale-backend.onrender.com/wholesale/approve?token=${token}`;
-const declineLink = `https://lj-wholesale-backend.onrender.com/wholesale/decline?token=${token}`;
 
   const html = `
     <div style="font-family: Poppins, sans-serif; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; max-width: 600px; margin: 30px auto; color: #333;">
@@ -60,11 +59,8 @@ const declineLink = `https://lj-wholesale-backend.onrender.com/wholesale/decline
       </table>
 
       <div style="margin: 30px 0; text-align: center;">
-        <a href="${approveLink}" style="display: inline-block; background-color: #618C02; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; margin-right: 12px;">
-          <span style="color: #fff; font-size: 16px; vertical-align: middle;">✔</span> Approve
-        </a>
-        <a href="${declineLink}" style="display: inline-block; background-color: #D32F2F; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
-          <span style="color: #fff; font-size: 16px; vertical-align: middle;">✖</span> Decline
+        <a href="${approveLink}" style="display: inline-block; background-color: #618C02; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
+          ✔ Approve
         </a>
       </div>
 
@@ -85,6 +81,7 @@ const declineLink = `https://lj-wholesale-backend.onrender.com/wholesale/decline
   });
 };
 
+// ✅ Customer Confirmation Email
 const sendCustomerEmail = async ({ contact_email, contact_name }) => {
   const html = `
     <div style="font-family: Poppins, sans-serif; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; max-width: 600px; margin: 30px auto; text-align: center; color: #000;">
@@ -102,17 +99,16 @@ const sendCustomerEmail = async ({ contact_email, contact_name }) => {
     </div>
   `;
 
-  const mailOptions = {
+  await transporter.sendMail({
     from: `"Little Joy Confectionery" <${process.env.EMAIL_USER}>`,
     to: contact_email,
     replyTo: 'info@sugarlean.com.au',
     subject: '🎉 Thanks for Applying to Little Joy Wholesale!',
     html,
-  };
-
-  await transporter.sendMail(mailOptions);
+  });
 };
 
+// ✅ Approval Email to Graphics Team
 const sendApprovalEmail = async ({
   business_name,
   contact_name,
@@ -135,9 +131,6 @@ const sendApprovalEmail = async ({
     timeZone: 'Australia/Sydney',
   });
 
-  const approveLink = `https://lj-wholesale-backend.onrender.com/wholesale/approve?token=${token}`;
-  const declineLink = `https://lj-wholesale-backend.onrender.com/wholesale/decline?token=${token}`;
-
   const html = `
     <div style="font-family: Poppins, sans-serif; background: #ffffff; border: 1px solid #eee; border-radius: 16px; padding: 30px; max-width: 640px; margin: 30px auto; color: #000;">
       <div style="text-align: center; margin-bottom: 25px;">
@@ -158,11 +151,6 @@ const sendApprovalEmail = async ({
         <tr><td><strong>Terms Accepted:</strong></td><td>${terms_accepted ? '✅ Yes' : '❌ No'}</td></tr>
       </table>
 
-      <div style="margin: 30px 0; text-align: center;">
-        <a href="${approveLink}" style="background-color: #618C02; color: white; padding: 10px 24px; text-decoration: none; font-weight: 600; border-radius: 6px; margin-right: 10px;">✔️ Approve</a>
-        <a href="${declineLink}" style="background-color: #D32F2F; color: white; padding: 10px 24px; text-decoration: none; font-weight: 600; border-radius: 6px;">❌ Decline</a>
-      </div>
-
       <div style="margin-top: 30px; font-size: 12px; color: #888; text-align: center;">
         <p>Submitted: ${now}</p>
         <p>From website: <a href="https://www.littlejoy.com.au" style="color: #618C02;">littlejoy.com.au</a></p>
@@ -179,31 +167,8 @@ const sendApprovalEmail = async ({
   });
 };
 
-const sendDeclineEmail = async ({ email }) => {
-  const html = `
-    <div style="font-family: Poppins, sans-serif; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; max-width: 600px; margin: 30px auto; color: #000; text-align: center;">
-      <img src="https://cdn.shopify.com/s/files/1/0935/0912/4390/files/Little_joy_Logo_Leaf-11.png?v=1741143803" style="height: 50px; margin-bottom: 20px;">
-      <h2 style="color: #618C02;">Wholesale Application Update</h2>
-      <p style="font-size: 15px; line-height: 1.6;">
-        Thank you for applying for a wholesale account with Little Joy Confectionery.<br><br>
-        After reviewing your application, we’re unable to proceed at this time.<br><br>
-        If you believe this may be a mistake or have questions, please feel free to contact us at <a href="mailto:info@sugarlean.com.au">info@sugarlean.com.au</a>.
-      </p>
-      <p style="margin-top: 30px;">Warm regards,<br><strong>The Little Joy Team</strong></p>
-    </div>
-  `;
-
-  await transporter.sendMail({
-    from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: 'Little Joy Wholesale Application – Update',
-    html,
-  });
-};
-
 module.exports = {
   sendAdminEmail,
   sendCustomerEmail,
   sendApprovalEmail,
-  sendDeclineEmail,
 };
