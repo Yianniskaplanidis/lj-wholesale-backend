@@ -1,4 +1,3 @@
-// routes/wholesale.js
 const express = require('express');
 const router = express.Router();
 const {
@@ -8,6 +7,7 @@ const {
   sendDeclineEmail
 } = require('../utils/sendEmail');
 
+const { sendOrderEmail } = require('../utils/sendOrderEmail'); // Import your new order email util
 const crypto = require('crypto');
 
 // Shared secret key for signing (keep safe)
@@ -116,6 +116,64 @@ router.get('/decline', async (req, res) => {
   } catch (err) {
     console.error('Decline Email Error:', err);
     res.status(500).send('Failed to send decline email.');
+  }
+});
+
+// NEW ROUTE: POST /wholesale/order
+router.post('/order', async (req, res) => {
+  try {
+    const {
+      businessName,
+      contactName,
+      email,
+      phone,
+      customerNumber,
+      address,
+      submissionDate,
+      submissionNumber,
+      orderItems,
+      total,
+    } = req.body;
+
+    if (!email || !orderItems || !orderItems.length) {
+      return res.status(400).json({ error: 'Missing required order information.' });
+    }
+
+    // Send order emails (admin and customer)
+    await sendOrderEmail({
+      to: 'info@sugarlean.com.au',
+      subject: `New Wholesale Order from ${businessName || contactName}`,
+      businessName,
+      contactName,
+      email,
+      phone,
+      customerNumber,
+      address,
+      submissionDate,
+      submissionNumber,
+      orderItems,
+      total,
+    });
+
+    await sendOrderEmail({
+      to: email,
+      subject: 'Your Wholesale Order Confirmation',
+      businessName,
+      contactName,
+      email,
+      phone,
+      customerNumber,
+      address,
+      submissionDate,
+      submissionNumber,
+      orderItems,
+      total,
+    });
+
+    res.json({ success: true, message: 'Order submitted and confirmation emails sent.' });
+  } catch (err) {
+    console.error('Order submission error:', err);
+    res.status(500).json({ error: 'Failed to submit order.' });
   }
 });
 
