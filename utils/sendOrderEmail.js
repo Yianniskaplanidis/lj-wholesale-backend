@@ -1,10 +1,16 @@
 // utils/sendOrderEmail.js
+require('dotenv').config(); // ensure .env is loaded here or in your main server.js before this module loads
 const nodemailer = require('nodemailer');
 
+console.log('EMAIL_USER:', process.env.EMAIL_USER);
+console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '****' : 'NOT SET');
+console.log('EMAIL_HOST:', process.env.EMAIL_HOST);
+console.log('EMAIL_PORT:', process.env.EMAIL_PORT);
+
 const transporter = nodemailer.createTransport({
-  host: 'smtp.office365.com',
-  port: 587,
-  secure: false, // use STARTTLS
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT, 10),
+  secure: false, // use STARTTLS for port 587
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -83,13 +89,18 @@ async function sendOrderEmail({ order, to }) {
   const html = generateOrderEmailHTML(order);
 
   for (const recipient of to) {
-    await transporter.sendMail({
-      from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
-      to: recipient,
-      subject: `Wholesale Order Confirmation - ${order.submissionNumber}`,
-      html,
-    });
-    console.log(`Order email sent to ${recipient}`);
+    try {
+      await transporter.sendMail({
+        from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
+        to: recipient,
+        subject: `Wholesale Order Confirmation - ${order.submissionNumber}`,
+        html,
+      });
+      console.log(`Order email sent to ${recipient}`);
+    } catch (err) {
+      console.error(`Failed to send order email to ${recipient}:`, err);
+      throw err;
+    }
   }
 }
 
