@@ -31,19 +31,19 @@ function generateOrderEmailHTML(order) {
 
   const productRows = order.products.map((p, i) => `
     <tr style="background-color: ${i % 2 === 0 ? '#f9fbe9' : 'white'};">
-      <td style="padding:8px; border: 1px solid ${lightBorder}; text-align:center;">${i + 1}</td>
-      <td style="padding:8px; border: 1px solid ${lightBorder};">${p.name}</td>
-      <td style="padding:8px; border: 1px solid ${lightBorder}; text-align:center;">${p.refNo}</td>
-      <td style="padding:8px; border: 1px solid ${lightBorder}; text-align:center;">${p.qty}</td>
-      <td style="padding:8px; border: 1px solid ${lightBorder}; text-align:right;">${formatCurrency(p.unitPrice)}</td>
-      <td style="padding:8px; border: 1px solid ${lightBorder}; text-align:right;">${formatCurrency(p.qty * p.unitPrice)}</td>
+      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center; font-family: 'Poppins', sans-serif;">${i + 1}</td>
+      <td style="padding:12px; border: 1px solid ${lightBorder}; font-family: 'Poppins', sans-serif;">${p.name}</td>
+      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center; font-family: 'Poppins', sans-serif;">${p.refNo}</td>
+      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center; font-family: 'Poppins', sans-serif;">${p.qty}</td>
+      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right; font-family: 'Poppins', sans-serif;">${formatCurrency(p.unitPrice)}</td>
+      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right; font-family: 'Poppins', sans-serif;">${formatCurrency(p.qty * p.unitPrice)}</td>
     </tr>
   `).join('');
 
   return `
-  <div style="font-family: Arial, sans-serif; color: #3c3c3c; padding: 20px; background-color: #fafafa;">
-    <h2 style="color: ${mainGreen}; font-family: 'Comic Sans MS', cursive, sans-serif;">Customer Information</h2>
-    <div style="background-color: #f9fbe9; border: 1px solid ${lightBorder}; border-radius: 8px; padding: 15px; max-width: 600px;">
+  <div style="font-family: 'Poppins', sans-serif; color: #3c3c3c; padding: 25px; background-color: #fafafa; max-width: 700px; margin: auto;">
+    <h2 style="color: ${mainGreen}; font-weight: 700; font-size: 24px; margin-bottom: 20px;">Customer Information</h2>
+    <div style="background-color: #f9fbe9; border: 1px solid ${lightBorder}; border-radius: 8px; padding: 20px;">
       <p><strong>Business Name:</strong> ${order.businessName}</p>
       <p><strong>Contact Name:</strong> ${order.contactName}</p>
       <p><strong>Email:</strong> ${order.email}</p>
@@ -52,35 +52,36 @@ function generateOrderEmailHTML(order) {
       <p><strong>Address:</strong> ${order.address}</p>
     </div>
 
-    <h2 style="color: ${mainGreen}; font-family: 'Comic Sans MS', cursive, sans-serif; margin-top: 30px;">Order Summary</h2>
-    <table style="border-collapse: collapse; width: 100%; max-width: 700px;">
+    <h2 style="color: ${mainGreen}; font-weight: 700; font-size: 24px; margin: 40px 0 20px;">Order Summary</h2>
+    <table style="border-collapse: collapse; width: 100%;">
       <thead>
-        <tr style="background-color: ${mainGreen}; color: white;">
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: left;">Submission Date: ${order.submissionDate}</th>
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: right;">Submission Number: ${order.submissionNumber}</th>
+        <tr style="background-color: ${mainGreen}; color: white; font-weight: 700; font-size: 14px;">
+          <th style="padding: 16px; border: 1px solid ${lightBorder}; text-align: left;">Submission Date: ${order.submissionDate}</th>
+          <th style="padding: 16px; border: 1px solid ${lightBorder}; text-align: right;">Submission Number: ${order.submissionNumber}</th>
         </tr>
-        <tr style="background-color: ${lightGreenBg}; color: #3c3c3c; font-weight: bold;">
-          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 5%;">#</th>
-          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 45%;">Product</th>
-          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 15%;">Ref No.</th>
-          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 10%;">Qty</th>
-          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 15%;">Unit Price</th>
-          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 15%;">Subtotal</th>
+        <tr style="background-color: ${lightGreenBg}; color: #3c3c3c; font-weight: 600; font-size: 14px;">
+          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 5%;">#</th>
+          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 45%;">Product</th>
+          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 15%;">Ref No.</th>
+          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 10%;">Qty</th>
+          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 15%;">Unit Price</th>
+          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 15%;">Subtotal</th>
         </tr>
       </thead>
       <tbody>
         ${productRows}
       </tbody>
       <tfoot>
-        <tr style="background-color: ${lightGreenBg}; font-weight: bold;">
-          <td colspan="5" style="padding: 10px; border: 1px solid ${lightBorder}; text-align: right;">Total:</td>
-          <td style="padding: 10px; border: 1px solid ${lightBorder}; text-align: right;">${formatCurrency(order.total)}</td>
+        <tr style="background-color: ${lightGreenBg}; font-weight: 700; font-size: 14px;">
+          <td colspan="5" style="padding: 14px; border: 1px solid ${lightBorder}; text-align: right;">Total:</td>
+          <td style="padding: 14px; border: 1px solid ${lightBorder}; text-align: right;">${formatCurrency(order.total)}</td>
         </tr>
       </tfoot>
     </table>
   </div>
   `;
 }
+
 
 async function sendOrderEmail({ order, to }) {
   if (!to || to.length === 0) throw new Error('Recipient email(s) required');
