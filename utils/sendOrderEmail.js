@@ -45,7 +45,7 @@ function generateOrderEmailHTML(order) {
 
     <!-- LOGO -->
     <div style="text-align: center; margin-bottom: 24px;">
-      <img src="https://www.littlejoy.com.au/cdn/shop/files/littlejoy-logo.png" alt="Little Joy Logo" style="max-width: 160px; height: auto;">
+      <img src="https://cdn.shopify.com/s/files/1/0935/0912/4390/files/Little_joy_Logo_Dark-01.png?v=1742865985" alt="Little Joy Logo" style="max-width: 160px; height: auto;">
     </div>
 
     <!-- CUSTOMER INFO -->
