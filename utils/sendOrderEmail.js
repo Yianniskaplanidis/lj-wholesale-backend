@@ -26,19 +26,21 @@ function formatCurrency(num) {
 
 function generateOrderEmailHTML(order) {
   const mainGreen = '#618C02';
+  const headerGreen = '#648100';  // darker green like example
   const lightGreenBg = '#f4fbe1';
   const lightBorder = '#d3e3bc';
 
   const productRows = order.products.map((p, i) => `
-    <tr style="background-color: ${i % 2 === 0 ? '#f9fbe9' : 'white'};">
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center; font-family: 'Poppins', sans-serif;">${i + 1}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder}; font-family: 'Poppins', sans-serif;">${p.name}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center; font-family: 'Poppins', sans-serif;">${p.refNo}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center; font-family: 'Poppins', sans-serif;">${p.qty}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right; font-family: 'Poppins', sans-serif;">${formatCurrency(p.unitPrice)}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right; font-family: 'Poppins', sans-serif;">${formatCurrency(p.qty * p.unitPrice)}</td>
-    </tr>
-  `).join('');
+  <tr style="background-color: white;">
+    <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center; font-family: 'Poppins', sans-serif;">${i + 1}</td>
+    <td style="padding:12px; border: 1px solid ${lightBorder}; font-family: 'Poppins', sans-serif;">${p.name}</td>
+    <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center; font-family: 'Poppins', sans-serif;">${p.refNo}</td>
+    <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center; font-family: 'Poppins', sans-serif;">${p.qty}</td>
+    <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right; font-family: 'Poppins', sans-serif;">${formatCurrency(p.unitPrice)}</td>
+    <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right; font-family: 'Poppins', sans-serif;">${formatCurrency(p.qty * p.unitPrice)}</td>
+  </tr>
+`).join('');
+
 
   return `
   <div style="font-family: 'Poppins', sans-serif; color: #3c3c3c; padding: 25px; background-color: #fafafa; max-width: 700px; margin: auto;">
@@ -53,21 +55,26 @@ function generateOrderEmailHTML(order) {
     </div>
 
     <h2 style="color: ${mainGreen}; font-weight: 700; font-size: 24px; margin: 40px 0 20px;">Order Summary</h2>
-    <table style="border-collapse: collapse; width: 100%;">
+    <table style="border-collapse: collapse; width: 100%; border: 1px solid ${lightBorder};">
       <thead>
-        <tr style="background-color: ${mainGreen}; color: white; font-weight: 700; font-size: 14px;">
-          <th style="padding: 16px; border: 1px solid ${lightBorder}; text-align: left;">Submission Date: ${order.submissionDate}</th>
-          <th style="padding: 16px; border: 1px solid ${lightBorder}; text-align: right;">Submission Number: ${order.submissionNumber}</th>
-        </tr>
-        <tr style="background-color: ${lightGreenBg}; color: #3c3c3c; font-weight: 600; font-size: 14px;">
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 5%;">#</th>
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 45%;">Product</th>
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 15%;">Ref No.</th>
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 10%;">Qty</th>
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 15%;">Unit Price</th>
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; width: 15%;">Subtotal</th>
-        </tr>
-      </thead>
+  <tr>
+    <th style="background-color: #618C02; color: white; padding: 16px; font-weight: 700; width: 50%; border: 1px solid #d3e3bc; text-align: left; vertical-align: middle;">
+      Submission Date: <strong>02 July 2025</strong>
+    </th>
+    <th style="background-color: #618C02; color: white; padding: 16px; font-weight: 700; width: 50%; border: 1px solid #d3e3bc; text-align: right; vertical-align: middle;">
+      Submission Number: <strong>CUS123456-000001</strong>
+    </th>
+  </tr>
+  <tr style="background-color: #f4fbe1; font-weight: 700; font-size: 14px; color: #3c3c3c;">
+    <th style="padding: 12px; border: 1px solid #d3e3bc; text-align: center; width: 5%;">#</th>
+    <th style="padding: 12px; border: 1px solid #d3e3bc; text-align: left; width: 45%;">Product</th>
+    <th style="padding: 12px; border: 1px solid #d3e3bc; text-align: center; width: 15%;">Ref No.</th>
+    <th style="padding: 12px; border: 1px solid #d3e3bc; text-align: center; width: 10%;">Qty</th>
+    <th style="padding: 12px; border: 1px solid #d3e3bc; text-align: right; width: 15%;">Unit Price</th>
+    <th style="padding: 12px; border: 1px solid #d3e3bc; text-align: right; width: 15%;">Subtotal</th>
+  </tr>
+</thead>
+
       <tbody>
         ${productRows}
       </tbody>
@@ -81,6 +88,8 @@ function generateOrderEmailHTML(order) {
   </div>
   `;
 }
+
+
 
 
 async function sendOrderEmail({ order, to }) {
