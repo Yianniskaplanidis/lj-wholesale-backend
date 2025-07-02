@@ -60,7 +60,7 @@ function generateOrderEmailHTML(order) {
     </div>
 
     <!-- ORDER SUMMARY -->
-    <h2 style="color: ${mainGreen}; font-weight: 700; font-size: 24px; margin: 40px 0 20px;">Little Joy Wholesale Order Summary</h2>
+    <h2 style="color: ${mainGreen}; font-weight: 700; font-size: 24px; margin: 40px 0 20px;">Wholesale Order Summary</h2>
     <table style="border-collapse: collapse; width: 100%; border: 1px solid ${lightBorder};">
       <thead>
         <tr>
@@ -109,7 +109,7 @@ async function sendOrderEmail({ order, to }) {
       await transporter.sendMail({
         from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
         to: recipient,
-        subject: `Wholesale Order Confirmation - ${order.submissionNumber}`,
+        subject: `Little Joy Wholesale Order Confirmation - ${order.submissionNumber}`,
         html,
       });
       console.log(`Order email sent to ${recipient}`);
