@@ -7,13 +7,12 @@ const {
   sendDeclineEmail
 } = require('../utils/sendEmail');
 
-const { sendOrderEmail } = require('../utils/sendOrderEmail'); // Import your new order email util
+const { sendOrderEmail } = require('../utils/sendOrderEmail');
+const validateOrder = require('../middleware/validateOrder');
 const crypto = require('crypto');
 
-// Shared secret key for signing (keep safe)
 const SECRET_KEY = process.env.ACTION_SECRET || 'replace_this_secret';
 
-// 🔒 Create signed token
 function createSignedToken(email) {
   const timestamp = Date.now();
   const data = `${email}:${timestamp}`;
@@ -21,24 +20,20 @@ function createSignedToken(email) {
   return `${email}:${timestamp}:${hash}`;
 }
 
-// 🔒 Verify signed token
 function verifyToken(token) {
   if (!token) return null;
   const parts = token.split(':');
   if (parts.length !== 3) return null;
   const [email, timestamp, hash] = parts;
 
-  const expected = crypto.createHmac('sha256', SECRET_KEY)
-    .update(`${email}:${timestamp}`)
-    .digest('hex');
+  const expected = crypto.createHmac('sha256', SECRET_KEY).update(`${email}:${timestamp}`).digest('hex');
 
-  // Check hash and 10 min expiration
   const now = Date.now();
   const isValid = expected === hash && now - parseInt(timestamp) < 10 * 60 * 1000;
   return isValid ? email : null;
 }
 
-// ✅ POST /wholesale/signup
+// Signup route
 router.post('/signup', async (req, res) => {
   const {
     business_name,
@@ -52,15 +47,7 @@ router.post('/signup', async (req, res) => {
     terms_accepted
   } = req.body;
 
-  if (
-    !business_name ||
-    !contact_name ||
-    !contact_number ||
-    !abn ||
-    !contact_email ||
-    !address ||
-    (terms_accepted !== true && terms_accepted !== 'true')
-  ) {
+  if (!business_name || !contact_name || !contact_number || !abn || !contact_email || !address || (terms_accepted !== true && terms_accepted !== 'true')) {
     return res.status(400).json({ error: 'Missing required fields or terms not accepted.' });
   }
 
@@ -77,7 +64,7 @@ router.post('/signup', async (req, res) => {
       message,
       accepts_marketing,
       terms_accepted,
-      token // ✅ Include token in admin email for action buttons
+      token
     });
 
     await sendCustomerEmail({ contact_email, contact_name });
@@ -89,7 +76,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// ✅ GET /wholesale/approve?token=...
+// Approval route
 router.get('/approve', async (req, res) => {
   const { token } = req.query;
   const email = verifyToken(token);
@@ -104,7 +91,7 @@ router.get('/approve', async (req, res) => {
   }
 });
 
-// ✅ GET /wholesale/decline?token=...
+// Decline route
 router.get('/decline', async (req, res) => {
   const { token } = req.query;
   const email = verifyToken(token);
@@ -119,61 +106,20 @@ router.get('/decline', async (req, res) => {
   }
 });
 
-// NEW ROUTE: POST /wholesale/order
-router.post('/order', async (req, res) => {
+// Corrected Send wholesale order route with validation middleware
+router.post('/send-order', validateOrder, async (req, res) => {
   try {
-    const {
-      businessName,
-      contactName,
-      email,
-      phone,
-      customerNumber,
-      address,
-      submissionDate,
-      submissionNumber,
-      orderItems,
-      total,
-    } = req.body;
-
-    if (!email || !orderItems || !orderItems.length) {
-      return res.status(400).json({ error: 'Missing required order information.' });
-    }
-
-    // Send order emails (admin and customer)
-    await sendOrderEmail({
-      to: 'info@sugarlean.com.au',
-      subject: `New Wholesale Order from ${businessName || contactName}`,
-      businessName,
-      contactName,
-      email,
-      phone,
-      customerNumber,
-      address,
-      submissionDate,
-      submissionNumber,
-      orderItems,
-      total,
-    });
+    const order = req.body;
 
     await sendOrderEmail({
-      to: email,
-      subject: 'Your Wholesale Order Confirmation',
-      businessName,
-      contactName,
-      email,
-      phone,
-      customerNumber,
-      address,
-      submissionDate,
-      submissionNumber,
-      orderItems,
-      total,
+      order,
+      to: [process.env.ADMIN_EMAIL, order.email],
     });
 
-    res.json({ success: true, message: 'Order submitted and confirmation emails sent.' });
-  } catch (err) {
-    console.error('Order submission error:', err);
-    res.status(500).json({ error: 'Failed to submit order.' });
+    res.json({ message: 'Order emails sent successfully.' });
+  } catch (error) {
+    console.error('Failed to send order emails:', error);
+    res.status(500).json({ error: 'Failed to send order emails' });
   }
 });
 

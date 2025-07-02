@@ -1,104 +1,96 @@
+// utils/sendOrderEmail.js
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT) || 587,
-  secure: false,
+  host: 'smtp.office365.com',
+  port: 587,
+  secure: false, // use STARTTLS
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  tls: { ciphers: 'SSLv3' },
+  tls: {
+    ciphers: 'SSLv3',
+  },
 });
 
-function buildOrderEmailHTML({
-  businessName,
-  contactName,
-  email,
-  phone,
-  customerNumber,
-  address,
-  submissionDate,
-  submissionNumber,
-  orderItems,
-  total,
-}) {
-  const orderRowsHTML = orderItems.map((item, index) => `
-    <tr>
-      <td style="padding: 8px; border: 1px solid #c4d59f; text-align: center;">${index + 1}</td>
-      <td style="padding: 8px; border: 1px solid #c4d59f;">${item.productName}</td>
-      <td style="padding: 8px; border: 1px solid #c4d59f; text-align: center;">${item.refNo}</td>
-      <td style="padding: 8px; border: 1px solid #c4d59f; text-align: center;">${item.qty}</td>
-      <td style="padding: 8px; border: 1px solid #c4d59f; text-align: right;">${item.unitPrice}</td>
-      <td style="padding: 8px; border: 1px solid #c4d59f; text-align: right;">${item.subtotal}</td>
+function formatCurrency(num) {
+  return `$${num.toFixed(2)}`;
+}
+
+function generateOrderEmailHTML(order) {
+  const mainGreen = '#618C02';
+  const lightGreenBg = '#f4fbe1';
+  const lightBorder = '#d3e3bc';
+
+  const productRows = order.products.map((p, i) => `
+    <tr style="background-color: ${i % 2 === 0 ? '#f9fbe9' : 'white'};">
+      <td style="padding:8px; border: 1px solid ${lightBorder}; text-align:center;">${i + 1}</td>
+      <td style="padding:8px; border: 1px solid ${lightBorder};">${p.name}</td>
+      <td style="padding:8px; border: 1px solid ${lightBorder}; text-align:center;">${p.refNo}</td>
+      <td style="padding:8px; border: 1px solid ${lightBorder}; text-align:center;">${p.qty}</td>
+      <td style="padding:8px; border: 1px solid ${lightBorder}; text-align:right;">${formatCurrency(p.unitPrice)}</td>
+      <td style="padding:8px; border: 1px solid ${lightBorder}; text-align:right;">${formatCurrency(p.qty * p.unitPrice)}</td>
     </tr>
   `).join('');
 
   return `
-  <div style="font-family: Arial, sans-serif; color: #1f4922; max-width: 700px; margin: auto; padding: 20px;">
-    <h2 style="color: #4d7700; font-family: 'Comic Sans MS', cursive, sans-serif;">Customer Information</h2>
-    <div style="background-color: #f4f9e4; border: 1px solid #c4d59f; border-radius: 8px; padding: 15px; margin-bottom: 30px;">
-      <p><strong>Business Name:</strong> ${businessName}</p>
-      <p><strong>Contact Name:</strong> ${contactName}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Phone:</strong> ${phone}</p>
-      <p><strong>Customer Number:</strong> ${customerNumber}</p>
-      <p><strong>Address:</strong> ${address}</p>
+  <div style="font-family: Arial, sans-serif; color: #3c3c3c; padding: 20px; background-color: #fafafa;">
+    <h2 style="color: ${mainGreen}; font-family: 'Comic Sans MS', cursive, sans-serif;">Customer Information</h2>
+    <div style="background-color: #f9fbe9; border: 1px solid ${lightBorder}; border-radius: 8px; padding: 15px; max-width: 600px;">
+      <p><strong>Business Name:</strong> ${order.businessName}</p>
+      <p><strong>Contact Name:</strong> ${order.contactName}</p>
+      <p><strong>Email:</strong> ${order.email}</p>
+      <p><strong>Phone:</strong> ${order.phone}</p>
+      <p><strong>Customer Number:</strong> ${order.customerNumber}</p>
+      <p><strong>Address:</strong> ${order.address}</p>
     </div>
 
-    <h2 style="color: #4d7700; font-family: 'Comic Sans MS', cursive, sans-serif;">Order Summary</h2>
-
-    <table style="border-collapse: collapse; width: 100%; font-size: 14px;">
+    <h2 style="color: ${mainGreen}; font-family: 'Comic Sans MS', cursive, sans-serif; margin-top: 30px;">Order Summary</h2>
+    <table style="border-collapse: collapse; width: 100%; max-width: 700px;">
       <thead>
-        <tr style="background-color: #618c02; color: white; font-weight: bold;">
-          <th style="padding: 10px; border: 1px solid #618c02; text-align: left;" colspan="3">
-            Submission Date: <span style="font-weight: 600;">${submissionDate}</span>
-          </th>
-          <th style="padding: 10px; border: 1px solid #618c02; text-align: right;" colspan="3">
-            Submission Number: <span style="font-weight: 600;">${submissionNumber}</span>
-          </th>
+        <tr style="background-color: ${mainGreen}; color: white;">
+          <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: left;">Submission Date: ${order.submissionDate}</th>
+          <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: right;">Submission Number: ${order.submissionNumber}</th>
         </tr>
-        <tr style="background-color: #f4f9e4; font-weight: 600;">
-          <th style="padding: 8px; border: 1px solid #c4d59f;">#</th>
-          <th style="padding: 8px; border: 1px solid #c4d59f; text-align: left;">Product</th>
-          <th style="padding: 8px; border: 1px solid #c4d59f;">Ref No.</th>
-          <th style="padding: 8px; border: 1px solid #c4d59f;">Qty</th>
-          <th style="padding: 8px; border: 1px solid #c4d59f; text-align: right;">Unit Price</th>
-          <th style="padding: 8px; border: 1px solid #c4d59f; text-align: right;">Subtotal</th>
+        <tr style="background-color: ${lightGreenBg}; color: #3c3c3c; font-weight: bold;">
+          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 5%;">#</th>
+          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 45%;">Product</th>
+          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 15%;">Ref No.</th>
+          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 10%;">Qty</th>
+          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 15%;">Unit Price</th>
+          <th style="padding: 8px; border: 1px solid ${lightBorder}; width: 15%;">Subtotal</th>
         </tr>
       </thead>
       <tbody>
-        ${orderRowsHTML}
-        <tr style="background-color: #f4f9e4; font-weight: bold;">
-          <td colspan="5" style="padding: 8px; border: 1px solid #c4d59f; text-align: right;">Total:</td>
-          <td style="padding: 8px; border: 1px solid #c4d59f; text-align: right;">${total}</td>
-        </tr>
+        ${productRows}
       </tbody>
+      <tfoot>
+        <tr style="background-color: ${lightGreenBg}; font-weight: bold;">
+          <td colspan="5" style="padding: 10px; border: 1px solid ${lightBorder}; text-align: right;">Total:</td>
+          <td style="padding: 10px; border: 1px solid ${lightBorder}; text-align: right;">${formatCurrency(order.total)}</td>
+        </tr>
+      </tfoot>
     </table>
-
-    <p style="margin-top: 30px; font-size: 13px; color: #555;">
-      If you need to make any changes to your order, please contact us at 
-      <a href="mailto:info@sugarlean.com.au" style="color: #618c02; text-decoration: none;">info@sugarlean.com.au</a> as soon as possible.
-    </p>
-
-    <footer style="margin-top: 40px; font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 10px; text-align: center;">
-      &copy; 2025 Little Joy Confectionery. All rights reserved.
-    </footer>
   </div>
   `;
 }
 
-async function sendOrderEmail(data) {
-  const html = buildOrderEmailHTML(data);
+async function sendOrderEmail({ order, to }) {
+  if (!to || to.length === 0) throw new Error('Recipient email(s) required');
+  if (!order) throw new Error('Order data required');
 
-  const mailOptions = {
-    from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
-    to: data.to,
-    subject: data.subject,
-    html,
-  };
+  const html = generateOrderEmailHTML(order);
 
-  return transporter.sendMail(mailOptions);
+  for (const recipient of to) {
+    await transporter.sendMail({
+      from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
+      to: recipient,
+      subject: `Wholesale Order Confirmation - ${order.submissionNumber}`,
+      html,
+    });
+    console.log(`Order email sent to ${recipient}`);
+  }
 }
 
-module.exports = { sendOrderEmail };
+module.exports = { sendOrderEmail, generateOrderEmailHTML };
