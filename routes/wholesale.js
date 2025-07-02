@@ -119,8 +119,9 @@ router.post('/send-order', validateOrder, async (req, res) => {
     res.json({ message: 'Order emails sent successfully.' });
   } catch (error) {
     console.error('Failed to send order emails:', error);
-    res.status(500).json({ error: 'Failed to send order emails' });
+    res.status(500).json({ error: 'Failed to send order emails', details: error.message });
   }
 });
+
 
 module.exports = router;
