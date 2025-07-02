@@ -60,9 +60,10 @@ function generateOrderEmailHTML(order) {
           <th colspan="3" style="background-color: ${mainGreen}; color: white; padding: 16px; text-align: left; font-weight: 600;">
             Submission Date: <strong>${order.submissionDate}</strong>
           </th>
-          <th colspan="3" style="background-color: ${mainGreen}; color: white; padding: 16px; text-align: right; font-weight: 600;">
-            Submission Number: <strong>${order.submissionNumber}</strong>
-          </th>
+          <th colspan="3" style="background-color: ${mainGreen}; color: white; padding: 16px; text-align: right; font-weight: 600; font-size: 12px;">
+  Submission Number: <strong>${order.submissionNumber}</strong>
+</th>
+
         </tr>
         <tr style="background-color: ${lightGreenBg}; color: #3c3c3c; font-weight: 600; font-size: 14px;">
           <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: center;">#</th>
