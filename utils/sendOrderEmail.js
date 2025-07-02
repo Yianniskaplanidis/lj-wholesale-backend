@@ -26,8 +26,7 @@ function formatCurrency(num) {
 
 function generateOrderEmailHTML(order) {
   const mainGreen = '#618C02';
-  const headerGreen = '#648100'; // darker green if needed
-  const lightGreenBg = '#f4fbe1';
+  const lightGreenBg = '#E1EDC1';  // your brand light green
   const lightBorder = '#d3e3bc';
 
   const productRows = order.products.map((p, i) => `
@@ -43,6 +42,13 @@ function generateOrderEmailHTML(order) {
 
   return `
   <div style="font-family: 'Poppins', sans-serif; color: #3c3c3c; padding: 25px; background-color: #fafafa; max-width: 700px; margin: auto;">
+
+    <!-- LOGO -->
+    <div style="text-align: center; margin-bottom: 24px;">
+      <img src="https://www.littlejoy.com.au/cdn/shop/files/littlejoy-logo.png" alt="Little Joy Logo" style="max-width: 160px; height: auto;">
+    </div>
+
+    <!-- CUSTOMER INFO -->
     <h2 style="color: ${mainGreen}; font-weight: 700; font-size: 24px; margin-bottom: 20px;">Customer Information</h2>
     <div style="background-color: #f9fbe9; border: 1px solid ${lightBorder}; border-radius: 8px; padding: 20px;">
       <p><strong>Business Name:</strong> ${order.businessName}</p>
@@ -53,17 +59,17 @@ function generateOrderEmailHTML(order) {
       <p><strong>Address:</strong> ${order.address}</p>
     </div>
 
-    <h2 style="color: ${mainGreen}; font-weight: 700; font-size: 24px; margin: 40px 0 20px;">Order Summary</h2>
+    <!-- ORDER SUMMARY -->
+    <h2 style="color: ${mainGreen}; font-weight: 700; font-size: 24px; margin: 40px 0 20px;">Little Joy Wholesale Order Summary</h2>
     <table style="border-collapse: collapse; width: 100%; border: 1px solid ${lightBorder};">
       <thead>
         <tr>
           <th colspan="3" style="background-color: ${mainGreen}; color: white; padding: 16px; text-align: left; font-weight: 600;">
             Submission Date: <strong>${order.submissionDate}</strong>
           </th>
-          <th colspan="3" style="background-color: ${mainGreen}; color: white; padding: 16px; text-align: right; font-weight: 600; font-size: 12px;">
-  Submission Number: <strong>${order.submissionNumber}</strong>
-</th>
-
+          <th colspan="3" style="background-color: ${mainGreen}; color: white; padding: 16px; text-align: right; font-weight: 600; font-size: 13px;">
+            Submission Number: <strong>${order.submissionNumber}</strong>
+          </th>
         </tr>
         <tr style="background-color: ${lightGreenBg}; color: #3c3c3c; font-weight: 600; font-size: 14px;">
           <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: center;">#</th>
@@ -89,8 +95,6 @@ function generateOrderEmailHTML(order) {
   </div>
   `;
 }
-
-
 
 
 
