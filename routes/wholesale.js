@@ -111,10 +111,13 @@ router.post('/send-order', validateOrder, async (req, res) => {
   try {
     const order = req.body;
 
-    await sendOrderEmail({
-      order,
-      to: [process.env.ADMIN_EMAIL, order.email],
-    });
+    const adminEmail = process.env.ADMIN_EMAIL || 'info@sugarlean.com.au';
+
+await sendOrderEmail({
+  order,
+  to: [adminEmail, order.email],
+});
+
 
     res.json({ message: 'Order emails sent successfully.' });
   } catch (error) {
