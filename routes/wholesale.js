@@ -112,15 +112,21 @@ router.post('/send-order', validateOrder, async (req, res) => {
     const order = req.body;
 
     // 🔢 Calculate total if not provided
-    if (!order.total) {
-      let total = 0;
-      for (const p of order.products) {
-        const qty = Number(p.qty) || 0;
-        const unit = Number(p.unitPrice) || 0;
-        total += qty * unit;
-      }
-      order.total = parseFloat(total.toFixed(2));
-    }
+    let total = 0;
+for (const p of order.products) {
+  const qty = Number(p.qty) || 0;
+const unit = Number(p.unit_price) || 0;
+  total += qty * unit;
+}
+order.total = parseFloat(total.toFixed(2));
+
+// Ensure these are passed to email template
+order.submissionDate = order.submissionDate || new Date().toLocaleDateString('en-AU', {
+  day: '2-digit', month: 'long', year: 'numeric'
+});
+order.submissionNumber = order.submissionNumber || 'Undefined-000001'; // Replace if you use actual incrementing ID
+
+
 
     const adminEmail = process.env.ADMIN_EMAIL || 'info@sugarlean.com.au';
 
