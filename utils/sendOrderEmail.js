@@ -6,7 +6,6 @@ console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '****' : 'NOT SET');
 console.log('EMAIL_HOST:', process.env.EMAIL_HOST);
 console.log('EMAIL_PORT:', process.env.EMAIL_PORT);
 
-// Setup transporter
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: parseInt(process.env.EMAIL_PORT, 10),
@@ -20,9 +19,20 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Simple in-memory counter (reset on server restart)
+// Replace this with a DB or file storage for persistence
+const submissionCounters = {};
+
 function formatCurrency(num) {
   if (typeof num !== 'number' || isNaN(num)) return '$0.00';
   return `$${num.toFixed(2)}`;
+}
+
+function formatSubmissionNumber(customerNumber, increment) {
+  const prefix = customerNumber && customerNumber.toUpperCase().startsWith('CUS')
+    ? customerNumber.toUpperCase()
+    : `CUS${(customerNumber || '00000').toUpperCase()}`;
+  return `${prefix}-${String(increment).padStart(6, '0')}`;
 }
 
 function generateOrderEmailHTML(order) {
@@ -94,12 +104,12 @@ function generateOrderEmailHTML(order) {
         <tfoot>
           <tr style="background-color: ${lightGreen}; font-weight: bold;">
             <td colspan="5" style="padding:14px; border:1px solid ${border}; text-align:right;"><strong>Total:</strong></td>
-            <td style="padding:14px; border:1px solid ${border}; text-align:right;"><strong>${formatCurrency(order.total)}</strong></td>
+            <td style="padding:14px; border:1px solid ${border}; text-align:right;"><strong>${formatCurrency(total)}</strong></td>
           </tr>
         </tfoot>
       </table>
 
-      <p style="text-align: center; margin-top: 30px; color: #777;">Thank you for your order!</p>
+      <!-- Removed thank you message as requested -->
     </div>
   `;
 }
@@ -108,7 +118,14 @@ async function sendOrderEmail({ order, to }) {
   if (!to || to.length === 0) throw new Error('Recipient email(s) required');
   if (!order || !order.products) throw new Error('Order data is invalid or missing');
 
-  const submissionNumber = order.submissionNumber || 'Undefined-000001';
+  // Generate submission number increment per customerNumber
+  const customerNumber = order.customerNumber || 'UNKNOWN';
+  submissionCounters[customerNumber] = (submissionCounters[customerNumber] || 0) + 1;
+  const submissionNumber = formatSubmissionNumber(customerNumber, submissionCounters[customerNumber]);
+
+  // Attach submission info to order
+  order.submissionNumber = submissionNumber;
+  order.submissionDate = new Date().toLocaleDateString('en-AU', { day: '2-digit', month: 'long', year: 'numeric' });
 
   try {
     const html = generateOrderEmailHTML(order);
