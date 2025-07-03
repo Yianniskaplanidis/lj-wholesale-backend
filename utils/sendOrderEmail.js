@@ -21,8 +21,10 @@ const transporter = nodemailer.createTransport({
 });
 
 function formatCurrency(num) {
+  if (typeof num !== 'number' || isNaN(num)) return '$0.00';
   return `$${num.toFixed(2)}`;
 }
+
 
 function generateOrderEmailHTML(order) {
   const mainGreen = '#618C02';
