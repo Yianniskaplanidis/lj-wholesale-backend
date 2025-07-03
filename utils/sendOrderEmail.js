@@ -30,10 +30,18 @@ function generateOrderEmailHTML(order) {
   const lightGreen = '#f4fbe1';
   const border = '#d3e3bc';
 
-  // Calculate totals if not provided
+  const submissionNumber = order.submissionNumber || 'Undefined-000001';
+  const submissionDate = order.submissionDate || new Date().toLocaleDateString('en-AU', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+
   let total = 0;
   const productRows = order.products.map((p, i) => {
-    const subtotal = p.qty * p.unitPrice;
+    const qty = p.qty || 0;
+    const unit = p.unitPrice || p.unit_price || 0;
+    const subtotal = qty * unit;
     total += subtotal;
 
     return `
@@ -41,10 +49,9 @@ function generateOrderEmailHTML(order) {
         <td style="padding:12px; border:1px solid ${border}; text-align:center;">${i + 1}</td>
         <td style="padding:12px; border:1px solid ${border};">${p.name}</td>
         <td style="padding:12px; border:1px solid ${border}; text-align:center;">${p.refNo}</td>
-        <td style="padding:12px; border:1px solid ${border}; text-align:center;">${p.qty}</td>
-<td style="padding:12px; border:1px solid ${border}; text-align:right;">${formatCurrency(p.unitPrice || p.unit_price || 0)}</td>
-<td style="padding:12px; border:1px solid ${border}; text-align:right;">${formatCurrency((p.qty || 0) * (p.unitPrice || p.unit_price || 0))}</td>
-
+        <td style="padding:12px; border:1px solid ${border}; text-align:center;">${qty}</td>
+        <td style="padding:12px; border:1px solid ${border}; text-align:right;">${formatCurrency(unit)}</td>
+        <td style="padding:12px; border:1px solid ${border}; text-align:right;">${formatCurrency(subtotal)}</td>
       </tr>
     `;
   }).join('');
@@ -69,8 +76,8 @@ function generateOrderEmailHTML(order) {
       <table style="width: 100%; border-collapse: collapse; border:1px solid ${border};">
         <thead>
           <tr style="background-color: ${mainGreen}; color: #fff;">
-            <th colspan="3" style="padding: 14px; text-align: left;">Submission Date: ${order.submissionDate}</th>
-            <th colspan="3" style="padding: 14px; text-align: right;">Submission Number: ${order.submissionNumber}</th>
+            <th colspan="3" style="padding: 14px; text-align: left;">Submission Date: ${submissionDate}</th>
+            <th colspan="3" style="padding: 14px; text-align: right;">Submission Number: ${submissionNumber}</th>
           </tr>
           <tr style="background-color: ${lightGreen}; color: #333;">
             <th style="padding:10px; border:1px solid ${border}; text-align:center;">#</th>
@@ -86,8 +93,8 @@ function generateOrderEmailHTML(order) {
         </tbody>
         <tfoot>
           <tr style="background-color: ${lightGreen}; font-weight: bold;">
-            <td colspan="5" style="padding:14px; border:1px solid ${border}; text-align:right;">Total:</td>
-            <td style="padding:14px; border:1px solid ${border}; text-align:right;">${formatCurrency(total)}</td>
+            <td colspan="5" style="padding:14px; border:1px solid ${border}; text-align:right;"><strong>Total:</strong></td>
+            <td style="padding:14px; border:1px solid ${border}; text-align:right;"><strong>${formatCurrency(order.total)}</strong></td>
           </tr>
         </tfoot>
       </table>
@@ -101,6 +108,8 @@ async function sendOrderEmail({ order, to }) {
   if (!to || to.length === 0) throw new Error('Recipient email(s) required');
   if (!order || !order.products) throw new Error('Order data is invalid or missing');
 
+  const submissionNumber = order.submissionNumber || 'Undefined-000001';
+
   try {
     const html = generateOrderEmailHTML(order);
 
@@ -108,7 +117,7 @@ async function sendOrderEmail({ order, to }) {
       await transporter.sendMail({
         from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
         to: recipient,
-        subject: `Wholesale Order Confirmation - ${order.submissionNumber}`,
+        subject: `Little Joy Wholesale Order Confirmation - ${submissionNumber}`,
         html,
       });
       console.log(`✅ Email sent to ${recipient}`);
