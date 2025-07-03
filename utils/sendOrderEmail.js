@@ -37,8 +37,8 @@ function generateOrderEmailHTML(order) {
       <td style="padding:12px; border: 1px solid ${lightBorder};">${p.name}</td>
       <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center;">${p.refNo}</td>
       <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center;">${p.qty}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right;">${formatCurrency(p.unitPrice)}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right;">${formatCurrency(p.qty * p.unitPrice)}</td>
+      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right;">${formatCurrency(p.unit_price)}</td>
+      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right;">${formatCurrency(p.qty * p.unit_price)}</td>
     </tr>
   `).join('');
 
@@ -88,7 +88,9 @@ function generateOrderEmailHTML(order) {
       <tfoot>
         <tr style="background-color: ${lightGreenBg}; font-weight: 700;">
           <td colspan="5" style="padding: 14px; border: 1px solid ${lightBorder}; text-align: right;">Total:</td>
-          <td style="padding: 14px; border: 1px solid ${lightBorder}; text-align: right;">${formatCurrency(order.total)}</td>
+          const total = order.products.reduce((sum, p) => sum + (p.qty * p.unit_price), 0);
+          <td style="padding: 14px; border: 1px solid ${lightBorder}; text-align: right;">${formatCurrency(total)}
+</td>
         </tr>
       </tfoot>
     </table>
