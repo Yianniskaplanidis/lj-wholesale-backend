@@ -106,18 +106,28 @@ router.get('/decline', async (req, res) => {
   }
 });
 
-// Corrected Send wholesale order route with validation middleware
+// Send wholesale order route (updated to compute total)
 router.post('/send-order', validateOrder, async (req, res) => {
   try {
     const order = req.body;
 
+    // 🔢 Calculate total if not provided
+    if (!order.total) {
+      let total = 0;
+      for (const p of order.products) {
+        const qty = Number(p.qty) || 0;
+        const unit = Number(p.unitPrice) || 0;
+        total += qty * unit;
+      }
+      order.total = parseFloat(total.toFixed(2));
+    }
+
     const adminEmail = process.env.ADMIN_EMAIL || 'info@sugarlean.com.au';
 
-await sendOrderEmail({
-  order,
-  to: [adminEmail, order.email],
-});
-
+    await sendOrderEmail({
+      order,
+      to: [adminEmail, order.email],
+    });
 
     res.json({ message: 'Order emails sent successfully.' });
   } catch (error) {
@@ -125,6 +135,5 @@ await sendOrderEmail({
     res.status(500).json({ error: 'Failed to send order emails', details: error.message });
   }
 });
-
 
 module.exports = router;
