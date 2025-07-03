@@ -10,7 +10,11 @@ dotenv.config();
 const app = express();
 
 // Enable CORS (you can configure origins here if needed)
-app.use(cors());
+app.use(cors({
+  origin: 'https://www.littlejoy.com.au', // your live Shopify domain
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
