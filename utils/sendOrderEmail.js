@@ -1,5 +1,4 @@
-// utils/sendOrderEmail.js
-require('dotenv').config(); // ensure .env is loaded here or in your main server.js before this module loads
+require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 console.log('EMAIL_USER:', process.env.EMAIL_USER);
@@ -7,10 +6,11 @@ console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '****' : 'NOT SET');
 console.log('EMAIL_HOST:', process.env.EMAIL_HOST);
 console.log('EMAIL_PORT:', process.env.EMAIL_PORT);
 
+// Setup transporter
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: parseInt(process.env.EMAIL_PORT, 10),
-  secure: false, // use STARTTLS for port 587
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -25,101 +25,101 @@ function formatCurrency(num) {
   return `$${num.toFixed(2)}`;
 }
 
-
 function generateOrderEmailHTML(order) {
   const mainGreen = '#618C02';
-  const lightGreenBg = '#E1EDC1';  // your brand light green
-  const lightBorder = '#d3e3bc';
+  const lightGreen = '#f4fbe1';
+  const border = '#d3e3bc';
 
-  const productRows = order.products.map((p, i) => `
-    <tr style="background-color: white;">
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center;">${i + 1}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder};">${p.name}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center;">${p.refNo}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:center;">${p.qty}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right;">${formatCurrency(p.qty * p.unit_price)}</td>
-      <td style="padding:12px; border: 1px solid ${lightBorder}; text-align:right;">${formatCurrency(total)}</td>
-    </tr>
-  `).join('');
+  // Calculate totals if not provided
+  let total = 0;
+  const productRows = order.products.map((p, i) => {
+    const subtotal = p.qty * p.unitPrice;
+    total += subtotal;
+
+    return `
+      <tr style="background-color: white;">
+        <td style="padding:12px; border:1px solid ${border}; text-align:center;">${i + 1}</td>
+        <td style="padding:12px; border:1px solid ${border};">${p.name}</td>
+        <td style="padding:12px; border:1px solid ${border}; text-align:center;">${p.refNo}</td>
+        <td style="padding:12px; border:1px solid ${border}; text-align:center;">${p.qty}</td>
+<td style="padding:12px; border:1px solid ${border}; text-align:right;">${formatCurrency(p.unitPrice || p.unit_price || 0)}</td>
+<td style="padding:12px; border:1px solid ${border}; text-align:right;">${formatCurrency((p.qty || 0) * (p.unitPrice || p.unit_price || 0))}</td>
+
+      </tr>
+    `;
+  }).join('');
 
   return `
-  <div style="font-family: 'Poppins', sans-serif; color: #3c3c3c; padding: 25px; background-color: #fafafa; max-width: 700px; margin: auto;">
+    <div style="font-family: Poppins, sans-serif; padding: 30px; background: #fff;">
+      <div style="text-align:center; margin-bottom: 24px;">
+        <img src="https://cdn.shopify.com/s/files/1/0935/0912/4390/files/Little_joy_Logo_Dark-01.png?v=1742865985" style="max-width:160px;" alt="Little Joy Logo">
+      </div>
 
-    <!-- LOGO -->
-    <div style="text-align: center; margin-bottom: 24px;">
-      <img src="https://cdn.shopify.com/s/files/1/0935/0912/4390/files/Little_joy_Logo_Dark-01.png?v=1742865985" alt="Little Joy Logo" style="max-width: 160px; height: auto;">
+      <h2 style="color:${mainGreen}; font-size: 20px; margin-bottom: 12px;">Customer Information</h2>
+      <div style="background-color:${lightGreen}; border:1px solid ${border}; border-radius: 8px; padding:16px; margin-bottom: 30px;">
+        <p><strong>Business Name:</strong> ${order.businessName}</p>
+        <p><strong>Contact Name:</strong> ${order.contactName}</p>
+        <p><strong>Email:</strong> ${order.email}</p>
+        <p><strong>Phone:</strong> ${order.phone}</p>
+        <p><strong>Customer Number:</strong> ${order.customerNumber}</p>
+        <p><strong>Address:</strong> ${order.address}</p>
+      </div>
+
+      <h2 style="color:${mainGreen}; font-size: 20px; margin-bottom: 12px;">Order Summary</h2>
+      <table style="width: 100%; border-collapse: collapse; border:1px solid ${border};">
+        <thead>
+          <tr style="background-color: ${mainGreen}; color: #fff;">
+            <th colspan="3" style="padding: 14px; text-align: left;">Submission Date: ${order.submissionDate}</th>
+            <th colspan="3" style="padding: 14px; text-align: right;">Submission Number: ${order.submissionNumber}</th>
+          </tr>
+          <tr style="background-color: ${lightGreen}; color: #333;">
+            <th style="padding:10px; border:1px solid ${border}; text-align:center;">#</th>
+            <th style="padding:10px; border:1px solid ${border}; text-align:left;">Product</th>
+            <th style="padding:10px; border:1px solid ${border}; text-align:center;">Ref No.</th>
+            <th style="padding:10px; border:1px solid ${border}; text-align:center;">Qty</th>
+            <th style="padding:10px; border:1px solid ${border}; text-align:right;">Unit Price</th>
+            <th style="padding:10px; border:1px solid ${border}; text-align:right;">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${productRows}
+        </tbody>
+        <tfoot>
+          <tr style="background-color: ${lightGreen}; font-weight: bold;">
+            <td colspan="5" style="padding:14px; border:1px solid ${border}; text-align:right;">Total:</td>
+            <td style="padding:14px; border:1px solid ${border}; text-align:right;">${formatCurrency(total)}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <p style="text-align: center; margin-top: 30px; color: #777;">Thank you for your order!</p>
     </div>
-
-    <!-- CUSTOMER INFO -->
-    <h2 style="color: ${mainGreen}; font-weight: 700; font-size: 24px; margin-bottom: 20px;">Customer Information</h2>
-    <div style="background-color: #f9fbe9; border: 1px solid ${lightBorder}; border-radius: 8px; padding: 20px;">
-      <p><strong>Business Name:</strong> ${order.businessName}</p>
-      <p><strong>Contact Name:</strong> ${order.contactName}</p>
-      <p><strong>Email:</strong> ${order.email}</p>
-      <p><strong>Phone:</strong> ${order.phone}</p>
-      <p><strong>Customer Number:</strong> ${order.customerNumber}</p>
-      <p><strong>Address:</strong> ${order.address}</p>
-    </div>
-
-    <!-- ORDER SUMMARY -->
-    <h2 style="color: ${mainGreen}; font-weight: 700; font-size: 24px; margin: 40px 0 20px;">Wholesale Order Summary</h2>
-    <table style="border-collapse: collapse; width: 100%; border: 1px solid ${lightBorder};">
-      <thead>
-        <tr>
-          <th colspan="3" style="background-color: ${mainGreen}; color: white; padding: 16px; text-align: left; font-weight: 600;">
-            Submission Date: <strong>${order.submissionDate}</strong>
-          </th>
-          <th colspan="3" style="background-color: ${mainGreen}; color: white; padding: 16px; text-align: right; font-weight: 600; font-size: 13px;">
-            Submission Number: <strong>${order.submissionNumber}</strong>
-          </th>
-        </tr>
-        <tr style="background-color: ${lightGreenBg}; color: #3c3c3c; font-weight: 600; font-size: 14px;">
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: center;">#</th>
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: left;">Product</th>
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: center;">Ref No.</th>
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: center;">Qty</th>
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: right;">Unit Price</th>
-          <th style="padding: 12px; border: 1px solid ${lightBorder}; text-align: right;">Subtotal</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${productRows}
-      </tbody>
-      <tfoot>
-        <tr style="background-color: ${lightGreenBg}; font-weight: 700;">
-          <td colspan="5" style="padding: 14px; border: 1px solid ${lightBorder}; text-align: right;">Total:</td>
-          <td style="padding: 14px; border: 1px solid ${lightBorder}; text-align: right;">${formatCurrency(order.total)}</td>
-        </tr>
-      </tfoot>
-    </table>
-
-    <p style="margin-top: 30px; text-align: center; font-style: italic; color: #666;">Thank you for your order!</p>
-  </div>
   `;
 }
 
-
-
 async function sendOrderEmail({ order, to }) {
   if (!to || to.length === 0) throw new Error('Recipient email(s) required');
-  if (!order) throw new Error('Order data required');
+  if (!order || !order.products) throw new Error('Order data is invalid or missing');
 
-  const html = generateOrderEmailHTML(order);
+  try {
+    const html = generateOrderEmailHTML(order);
 
-  for (const recipient of to) {
-    try {
+    for (const recipient of to) {
       await transporter.sendMail({
         from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
         to: recipient,
-        subject: `Little Joy Wholesale Order Confirmation - ${order.submissionNumber}`,
+        subject: `Wholesale Order Confirmation - ${order.submissionNumber}`,
         html,
       });
-      console.log(`Order email sent to ${recipient}`);
-    } catch (err) {
-      console.error(`Failed to send order email to ${recipient}:`, err);
-      throw err;
+      console.log(`✅ Email sent to ${recipient}`);
     }
+  } catch (err) {
+    console.error('❌ Failed to send order emails:', err);
+    throw new Error('Failed to send order emails');
   }
 }
 
-module.exports = { sendOrderEmail, generateOrderEmailHTML };
+module.exports = {
+  sendOrderEmail,
+  generateOrderEmailHTML,
+};
