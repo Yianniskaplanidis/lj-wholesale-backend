@@ -20,7 +20,12 @@ const sendAdminEmail = async ({
   contact_number,
   abn,
   contact_email,
-  address,
+  street_address,
+  street_address_2,
+  city,
+  state,
+  postcode,
+  country,
   message,
   accepts_marketing,
   terms_accepted
@@ -49,7 +54,12 @@ const sendAdminEmail = async ({
         <tr><td><strong>Phone:</strong></td><td>${contact_number}</td></tr>
         <tr><td><strong>ABN:</strong></td><td>${abn}</td></tr>
         <tr><td><strong>Email:</strong></td><td>${contact_email}</td></tr>
-        <tr><td><strong>Address:</strong></td><td>${address}</td></tr>
+        <tr><td><strong>Street Address:</strong></td><td>${street_address}</td></tr>
+        <tr><td><strong>Address Line 2:</strong></td><td>${street_address_2 || '(none)'}</td></tr>
+        <tr><td><strong>City:</strong></td><td>${city}</td></tr>
+        <tr><td><strong>State / Province:</strong></td><td>${state}</td></tr>
+        <tr><td><strong>Postcode:</strong></td><td>${postcode}</td></tr>
+        <tr><td><strong>Country:</strong></td><td>${country}</td></tr>
         <tr><td><strong>Message:</strong></td><td>${message || '(none)'}</td></tr>
         <tr><td><strong>Marketing Consent:</strong></td><td>${accepts_marketing ? '✅ Yes' : '❌ No'}</td></tr>
         <tr><td><strong>Terms Accepted:</strong></td><td>${terms_accepted ? '✅ Yes' : '❌ No'}</td></tr>
