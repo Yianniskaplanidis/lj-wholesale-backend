@@ -5,7 +5,8 @@ const {
   sendCustomerEmail,
   sendApprovalEmail,
   sendDeclineEmail
-} = require('./utils/sendSignupEmail');
+} = require('../utils/sendSignupEmail');
+
 
 const { sendOrderEmail } = require('../utils/sendOrderEmail');
 const validateOrder = require('../middleware/validateOrder');
