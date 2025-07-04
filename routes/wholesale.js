@@ -41,15 +41,34 @@ router.post('/signup', async (req, res) => {
     contact_number,
     abn,
     contact_email,
-    address,
+    street_address,
+    street_address_2,
+    city,
+    state,
+    postcode,
+    country,
     message,
     accepts_marketing,
     terms_accepted
   } = req.body;
 
-  if (!business_name || !contact_name || !contact_number || !abn || !contact_email || !address || (terms_accepted !== true && terms_accepted !== 'true')) {
+  // Validate required fields
+  if (
+    !business_name || !contact_name || !contact_number || !abn || !contact_email ||
+    !street_address || !city || !state || !postcode || !country ||
+    (terms_accepted !== true && terms_accepted !== 'true')
+  ) {
     return res.status(400).json({ error: 'Missing required fields or terms not accepted.' });
   }
+
+  const address = {
+    street_address,
+    street_address_2,
+    city,
+    state,
+    postcode,
+    country
+  };
 
   try {
     const token = createSignedToken(contact_email);
@@ -76,57 +95,27 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// Approval route
-router.get('/approve', async (req, res) => {
-  const { token } = req.query;
-  const email = verifyToken(token);
-  if (!email) return res.status(403).send('Invalid or expired token.');
-
-  try {
-    await sendApprovalEmail({ email });
-    res.send('✅ Approval email sent to graphics team.');
-  } catch (err) {
-    console.error('Approval Email Error:', err);
-    res.status(500).send('Failed to send approval email.');
-  }
-});
-
-// Decline route
-router.get('/decline', async (req, res) => {
-  const { token } = req.query;
-  const email = verifyToken(token);
-  if (!email) return res.status(403).send('Invalid or expired token.');
-
-  try {
-    await sendDeclineEmail({ email });
-    res.send('❌ Decline email sent to applicant.');
-  } catch (err) {
-    console.error('Decline Email Error:', err);
-    res.status(500).send('Failed to send decline email.');
-  }
-});
-
-// Send wholesale order route (updated to compute total)
+// Send wholesale order route
 router.post('/send-order', validateOrder, async (req, res) => {
   try {
     const order = req.body;
 
     // 🔢 Calculate total if not provided
     let total = 0;
-for (const p of order.products) {
-  const qty = Number(p.qty) || 0;
-const unit = Number(p.unit_price) || 0;
-  total += qty * unit;
-}
-order.total = parseFloat(total.toFixed(2));
+    for (const p of order.products) {
+      const qty = Number(p.qty) || 0;
+      const unit = Number(p.unit_price) || 0;
+      total += qty * unit;
+    }
+    order.total = parseFloat(total.toFixed(2));
 
-// Ensure these are passed to email template
-order.submissionDate = order.submissionDate || new Date().toLocaleDateString('en-AU', {
-  day: '2-digit', month: 'long', year: 'numeric'
-});
-order.submissionNumber = order.submissionNumber || 'Undefined-000001'; // Replace if you use actual incrementing ID
+    order.submissionDate = order.submissionDate || new Date().toLocaleDateString('en-AU', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
 
-
+    order.submissionNumber = order.submissionNumber || 'Undefined-000001';
 
     const adminEmail = process.env.ADMIN_EMAIL || 'info@sugarlean.com.au';
 

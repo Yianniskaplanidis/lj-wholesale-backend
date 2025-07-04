@@ -20,16 +20,20 @@ const sendAdminEmail = async ({
   contact_number,
   abn,
   contact_email,
-  street_address,
-  street_address_2,
-  city,
-  state,
-  postcode,
-  country,
+  address = {},
   message,
   accepts_marketing,
   terms_accepted
 }) => {
+  const {
+    street_address = 'undefined',
+    street_address_2 = '(none)',
+    city = 'undefined',
+    state = 'undefined',
+    postcode = 'undefined',
+    country = 'undefined'
+  } = address;
+
   const now = new Date().toLocaleString('en-AU', {
     day: '2-digit',
     month: 'short',
@@ -55,7 +59,7 @@ const sendAdminEmail = async ({
         <tr><td><strong>ABN:</strong></td><td>${abn}</td></tr>
         <tr><td><strong>Email:</strong></td><td>${contact_email}</td></tr>
         <tr><td><strong>Street Address:</strong></td><td>${street_address}</td></tr>
-        <tr><td><strong>Address Line 2:</strong></td><td>${street_address_2 || '(none)'}</td></tr>
+        <tr><td><strong>Address Line 2:</strong></td><td>${street_address_2}</td></tr>
         <tr><td><strong>City:</strong></td><td>${city}</td></tr>
         <tr><td><strong>State / Province:</strong></td><td>${state}</td></tr>
         <tr><td><strong>Postcode:</strong></td><td>${postcode}</td></tr>

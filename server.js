@@ -8,32 +8,31 @@ const wholesaleRoutes = require('./routes/wholesale');
 
 const app = express();
 
-// Enable CORS
+// ✅ Enable CORS for your Shopify domain
 app.use(cors({
   origin: 'https://www.littlejoy.com.au',
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 }));
 
-// Middleware
+// ✅ Middleware to parse JSON request bodies
 app.use(express.json());
 
-// Health check
-app.get('/ping', (req, res) => {
+// ✅ Health check route
+app.get('/api/ping', (req, res) => {
   res.send('✅ Wholesale backend is running.');
 });
 
-// Mount routes
-app.use('/wholesale', wholesaleRoutes);
+// ✅ Mount wholesale routes at /api/*
+app.use('/api', wholesaleRoutes);
 
-
-// Global error handler
+// ✅ Global error handler
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Start server
+// ✅ Start server on port (default to 3000)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
