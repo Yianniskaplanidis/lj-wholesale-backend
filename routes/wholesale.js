@@ -5,7 +5,7 @@ const {
   sendCustomerEmail,
   sendApprovalEmail,
   sendDeclineEmail
-} = require('../utils/sendEmail');
+} = require('./utils/sendSignupEmail');
 
 const { sendOrderEmail } = require('../utils/sendOrderEmail');
 const validateOrder = require('../middleware/validateOrder');
@@ -34,6 +34,7 @@ function verifyToken(token) {
 }
 
 // Signup route
+// Signup route
 router.post('/signup', async (req, res) => {
   const {
     business_name,
@@ -52,7 +53,6 @@ router.post('/signup', async (req, res) => {
     terms_accepted
   } = req.body;
 
-  // Validate required fields
   if (
     !business_name || !contact_name || !contact_number || !abn || !contact_email ||
     !street_address || !city || !state || !postcode || !country ||
@@ -73,20 +73,23 @@ router.post('/signup', async (req, res) => {
   try {
     const token = createSignedToken(contact_email);
 
-    await sendAdminEmail({
-      business_name,
-      contact_name,
-      contact_number,
-      abn,
-      contact_email,
-      address,
-      message,
-      accepts_marketing,
-      terms_accepted,
-      token
-    });
+    // ✅ Send both emails in parallel
+    await Promise.all([
+      sendAdminEmail({
+        business_name,
+        contact_name,
+        contact_number,
+        abn,
+        contact_email,
+        address,
+        message,
+        accepts_marketing,
+        terms_accepted,
+        token
+      }),
+      sendCustomerEmail({ contact_email, contact_name })
+    ]);
 
-    await sendCustomerEmail({ contact_email, contact_name });
 
     res.status(200).json({ success: true });
   } catch (err) {
