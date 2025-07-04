@@ -24,7 +24,8 @@ app.get('/ping', (req, res) => {
 });
 
 // Mount routes
-app.use('/api', wholesaleRoutes);
+app.use('/wholesale', wholesaleRoutes);
+
 
 // Global error handler
 app.use((err, req, res, next) => {
