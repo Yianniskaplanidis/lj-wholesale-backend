@@ -45,37 +45,38 @@ const sendAdminEmail = async ({
   });
 
   const html = `
-    <div style="font-family: Poppins, sans-serif; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; max-width: 600px; margin: 30px auto; color: #333;">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <img src="https://cdn.shopify.com/s/files/1/0935/0912/4390/files/Little_joy_Logo_Dark-01.png?v=1742865985" alt="Little Joy Logo" style="max-width: 140px;">
-      </div>
-
-      <h2 style="text-align: center; color: #618C02; margin-bottom: 30px;">📥 New Wholesale Signup Received</h2>
-
-      <table style="width: 100%; font-size: 14px; line-height: 1.8;">
-        <tr><td><strong>Business Name:</strong></td><td>${business_name}</td></tr>
-        <tr><td><strong>Contact Name:</strong></td><td>${contact_name}</td></tr>
-        <tr><td><strong>Phone:</strong></td><td>${contact_number}</td></tr>
-        <tr><td><strong>ABN:</strong></td><td>${abn}</td></tr>
-        <tr><td><strong>Email:</strong></td><td>${contact_email}</td></tr>
-        <tr><td><strong>Street Address:</strong></td><td>${street_address}</td></tr>
-        <tr><td><strong>Address Line 2:</strong></td><td>${street_address_2}</td></tr>
-        <tr><td><strong>City:</strong></td><td>${city}</td></tr>
-        <tr><td><strong>State / Province:</strong></td><td>${state}</td></tr>
-        <tr><td><strong>Postcode:</strong></td><td>${postcode}</td></tr>
-        <tr><td><strong>Country:</strong></td><td>${country}</td></tr>
-        <tr><td><strong>Message:</strong></td><td>${message || '(none)'}</td></tr>
-        <tr><td><strong>Marketing Consent:</strong></td><td>${accepts_marketing ? '✅ Yes' : '❌ No'}</td></tr>
-        <tr><td><strong>Terms Accepted:</strong></td><td>${terms_accepted ? '✅ Yes' : '❌ No'}</td></tr>
-      </table>
-
-      <div style="margin-top: 40px; font-size: 12px; color: #999; text-align: center;">
-        <p>Submitted: ${now}</p>
-        <p>From website: <a href="https://www.littlejoy.com.au" style="color: #618C02;">littlejoy.com.au</a></p>
-        <p>Contact: <a href="mailto:info@sugarlean.com.au" style="color: #618C02;">info@sugarlean.com.au</a></p>
-      </div>
+  <div style="font-family: Poppins, sans-serif; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; max-width: 600px; margin: 30px auto; color: #333;">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <img src="https://cdn.shopify.com/s/files/1/0935/0912/4390/files/Little_joy_Logo_Dark-01.png?v=1742865985" alt="Little Joy Logo" style="max-width: 140px;">
     </div>
-  `;
+
+    <h2 style="text-align: center; color: #618C02; margin-bottom: 30px;">📥 New Wholesale Signup Received</h2>
+
+    <table style="margin: 0 auto; font-size: 14px; line-height: 1.8; width: auto;">
+      <tr><td><strong>Business Name:</strong></td><td>${business_name}</td></tr>
+      <tr><td><strong>Contact Name:</strong></td><td>${contact_name}</td></tr>
+      <tr><td><strong>Phone:</strong></td><td>${contact_number}</td></tr>
+      <tr><td><strong>ABN:</strong></td><td>${abn}</td></tr>
+      <tr><td><strong>Email:</strong></td><td>${contact_email}</td></tr>
+      <tr><td><strong>Street Address:</strong></td><td>${street_address}</td></tr>
+      <tr><td><strong>Address Line 2:</strong></td><td>${street_address_2 || '(none)'}</td></tr>
+      <tr><td><strong>City:</strong></td><td>${city}</td></tr>
+      <tr><td><strong>State / Province:</strong></td><td>${state}</td></tr>
+      <tr><td><strong>Postcode:</strong></td><td>${postcode}</td></tr>
+      <tr><td><strong>Country:</strong></td><td>${country}</td></tr>
+      <tr><td><strong>Message:</strong></td><td>${message || '(none)'}</td></tr>
+      <tr><td><strong>Marketing Consent:</strong></td><td>${accepts_marketing ? '✅ Yes' : '❌ No'}</td></tr>
+      <tr><td><strong>Terms Accepted:</strong></td><td>${terms_accepted ? '✅ Yes' : '❌ No'}</td></tr>
+    </table>
+
+    <div style="margin-top: 40px; font-size: 12px; color: #999; text-align: center;">
+      <p>Submitted: ${now}</p>
+      <p>From website: <a href="https://www.littlejoy.com.au" style="color: #618C02;">littlejoy.com.au</a></p>
+      <p>Contact: <a href="mailto:info@sugarlean.com.au" style="color: #618C02;">info@sugarlean.com.au</a></p>
+    </div>
+  </div>
+`;
+
 
   await transporter.sendMail({
     from: `"Little Joy Wholesale" <${process.env.EMAIL_USER}>`,
