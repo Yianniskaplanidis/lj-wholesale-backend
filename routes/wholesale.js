@@ -35,7 +35,6 @@ function verifyToken(token) {
 }
 
 // Signup route
-// Signup route
 router.post('/signup', async (req, res) => {
   const {
     business_name,
