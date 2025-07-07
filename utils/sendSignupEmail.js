@@ -110,7 +110,7 @@ const sendCustomerEmail = async ({ contact_email, contact_name }) => {
     from: `"Little Joy Confectionery" <${process.env.EMAIL_USER}>`,
     to: contact_email,
     replyTo: 'info@sugarlean.com.au',
-    subject: '🎉 Thanks for Applying to Little Joy Wholesale!',
+    subject: '[DO NOT REPLY]🎉 Thanks for Applying to Little Joy Wholesale!',
     html,
   });
   console.timeEnd('sendCustomerEmail');
