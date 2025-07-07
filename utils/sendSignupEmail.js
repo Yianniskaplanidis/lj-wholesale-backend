@@ -95,7 +95,6 @@ const sendCustomerEmail = async ({ contact_email, contact_name }) => {
       <p style="font-size: 14px; line-height: 1.6;">
         We’ve received your wholesale application and are reviewing your details.<br>
         Our team will get back to you shortly.<br><br>
-        If you have any questions, contact us anytime.
       </p>
       <a href="https://www.littlejoy.com.au" style="margin-top: 30px; padding: 12px 24px; background-color: #618C02; color: white; border-radius: 6px; text-decoration: none; font-weight: 600;">Visit Our Store</a>
       <p style="margin-top: 40px; font-size: 12px; color: #999;">© 2025 Little Joy Confectionery</p>
